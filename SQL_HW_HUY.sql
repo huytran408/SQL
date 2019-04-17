@@ -92,13 +92,11 @@ in the table actor named description and use the data type BLOB (Make sure to re
 */
 
 
-
 /*
 5a. You cannot locate the schema of the address table. Which query would you use to re-create it?
-
 Hint: https://dev.mysql.com/doc/refman/5.7/en/show-create-table.html
 
-	SHOW CREATE TABLE address
+	DESCRIBE sakila.address
 */
 
 
@@ -132,10 +130,10 @@ Hint: https://dev.mysql.com/doc/refman/5.7/en/show-create-table.html
 /*
 6c. List each film and the number of actors who are listed for that film. Use tables film_actor and film. Use inner join.
 
-SELECT f.title, COUNT(fa.actor_id) AS '# of actors'
-FROM film as f INNER JOIN film_actor as fa
-ON f.film_id = fa.film_id
-GROUP BY f.title;
+	SELECT f.title, COUNT(fa.actor_id) AS '# of actors'
+	FROM film as f INNER JOIN film_actor as fa
+	ON f.film_id = fa.film_id
+	GROUP BY f.title;
 
 */
 
@@ -143,65 +141,65 @@ GROUP BY f.title;
 
 /*
 6d. How many copies of the film Hunchback Impossible exist in the inventory system?
-Select f.title, COUNT(i.film_id) as '# of copies'
-From film as f
-INNER JOIN inventory as i
-ON f.film_id = i.film_id
-WHERE title = 'Hunchback Impossible'
+	Select f.title, COUNT(i.film_id) as '# of copies'
+	From film as f
+	INNER JOIN inventory as i
+	ON f.film_id = i.film_id
+	WHERE title = 'Hunchback Impossible'
 */
 
 
 /*
 6e. Using the tables payment and customer and the JOIN command, list the total paid by each customer. List the customers alphabetically by last name:
-SELECT c.first_name, c.last_name, sum(p.amount) as 'Total Payments'
-FROM customer as c
-LEFT JOIN payment as p
-ON c.customer_id = p.customer_id
-group by last_name, first_name
-ORDER BY last_name asc
+	SELECT c.first_name, c.last_name, sum(p.amount) as 'Total Payments'
+	FROM customer as c
+	LEFT JOIN payment as p
+	ON c.customer_id = p.customer_id
+	group by last_name, first_name
+	ORDER BY last_name asc
 */
 
                 
 /*
 7a. The music of Queen and Kris Kristofferson have seen an unlikely resurgence. As an unintended consequence, films starting with the letters K and Q have also soared in popularity. Use subqueries to display the titles of movies starting with the letters K and Q whose language is English.
 
-SELECT * from film
-WHERE title like 'K%' OR title like 'Q%' AND
-language_id in (Select language_id
-				FROM language
-				WHERE name = 'English')
+	SELECT * from film
+	WHERE title like 'K%' OR title like 'Q%' AND
+	language_id in (Select language_id
+					FROM language
+					WHERE name = 'English')
 */
 
 
 /*
 7b. Use subqueries to display all actors who appear in the film Alone Trip.
 
-SELECT first_name, last_name
-FROM actor
-WHERE actor_id IN
-(
-Select actor_id
-FROM film_actor
-WHERE film_id IN 
-(
-SELECT film_id
-FROM film
-WHERE title = 'Alone Trip'
-));
+	SELECT first_name, last_name
+	FROM actor
+	WHERE actor_id IN
+	(
+	Select actor_id
+	FROM film_actor
+	WHERE film_id IN 
+	(
+	SELECT film_id
+	FROM film
+	WHERE title = 'Alone Trip'
+	));
 */
 
 
 /*
 7c. You want to run an email marketing campaign in Canada, for which you will need the names and email addresses of all Canadian customers. Use joins to retrieve this information.
-Select c.first_name,c.last_name,c.email,city, country
-FROM customer as c
-JOIN address as a
-ON c.address_id = a.address_id 
-JOIN city
-on a.city_id = city.city_id
-JOIN country
-on city.country_id = country.country_id
-WHERE country = 'Canada'
+	Select c.first_name,c.last_name,c.email,city, country
+	FROM customer as c
+	JOIN address as a
+	ON c.address_id = a.address_id 
+	JOIN city
+	on a.city_id = city.city_id
+	JOIN country
+	on city.country_id = country.country_id
+	WHERE country = 'Canada'
 */
 
 
@@ -250,38 +248,53 @@ WHERE country = 'Canada'
 
 /*
 7g. Write a query to display for each store its store ID, city, and country.
-SELECT s.store_id, cty.city, country.country 
-FROM store s
-JOIN address a 
-ON (s.address_id = a.address_id)
-JOIN city cty
-ON (cty.city_id = a.city_id)
-JOIN country
-ON (country.country_id = cty.country_id);
+	SELECT s.store_id, cty.city, country.country 
+	FROM store s
+	JOIN address a 
+	ON (s.address_id = a.address_id)
+	JOIN city cty
+	ON (cty.city_id = a.city_id)
+	JOIN country
+	ON (country.country_id = cty.country_id);
 */
 
 /*
 7h. List the top five genres in gross revenue in descending order. (Hint: you may need to use the following tables: category, film_category, inventory, payment, and rental.)
-SELECT c.name AS 'Genre', SUM(p.amount) AS 'Gross' 
-FROM category c
-JOIN film_category fc 
-ON (c.category_id=fc.category_id)
-JOIN inventory i 
-ON (fc.film_id=i.film_id)
-JOIN rental r 
-ON (i.inventory_id=r.inventory_id)
-JOIN payment p 
-ON (r.rental_id=p.rental_id)
-GROUP BY c.name ORDER BY Gross  LIMIT 5;
+	SELECT c.name AS 'Genre', SUM(p.amount) AS 'Gross' 
+	FROM category c
+	JOIN film_category fc 
+	ON (c.category_id=fc.category_id)
+	JOIN inventory i 
+	ON (fc.film_id=i.film_id)
+	JOIN rental r 
+	ON (i.inventory_id=r.inventory_id)
+	JOIN payment p 
+	ON (r.rental_id=p.rental_id)
+	GROUP BY c.name ORDER BY Gross  LIMIT 5;
 */
 
-
+/*
 8a. In your new role as an executive, you would like to have an easy way of viewing the Top five genres by gross revenue. Use the solution from the problem above to create a view. If you haven't solved 7h, you can substitute another query to create a view.
+	CREATE VIEW genre_revenue AS
+	SELECT c.name AS 'Genre', SUM(p.amount) AS 'Gross' 
+	FROM category c
+	JOIN film_category fc 
+	ON (c.category_id=fc.category_id)
+	JOIN inventory i 
+	ON (fc.film_id=i.film_id)
+	JOIN rental r 
+	ON (i.inventory_id=r.inventory_id)
+	JOIN payment p 
+	ON (r.rental_id=p.rental_id)
+	GROUP BY c.name ORDER BY Gross  LIMIT 5;
+*/
 
-
+/*
 8b. How would you display the view that you created in 8a?
+	Select * from genre_revenue
+*/
 
-
+/*
 8c. You find that you no longer need the view top_five_genres. Write a query to delete it.
-
+	DROP VIEW genre_revenue;
 */
